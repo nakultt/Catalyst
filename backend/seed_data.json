@@ -1,0 +1,307 @@
+{
+  "investors": [
+    {
+      "id": "inv_001",
+      "name": "Kongu Angels",
+      "type": "Angel Network",
+      "location": "Coimbatore",
+      "state": "Tamil Nadu",
+      "region": "South India",
+      "sectors": ["AgriTech", "Manufacturing", "Textiles", "Healthcare"],
+      "stage": ["Seed", "Pre-Seed"],
+      "ticket_size": "₹25L - ₹1Cr",
+      "portfolio_companies": ["FarmEasy", "TextileHub", "HealthFirst"],
+      "contact_email": "invest@konguangels.in",
+      "investment_thesis": "We focus on capital-efficient startups solving real problems for Tier-2 and Tier-3 cities. Strong preference for founders with domain expertise.",
+      "source": "Startup India Database, Page 45"
+    },
+    {
+      "id": "inv_002",
+      "name": "Sequoia India",
+      "type": "Venture Capital",
+      "location": "Bangalore",
+      "state": "Karnataka",
+      "region": "South India",
+      "sectors": ["FinTech", "SaaS", "Consumer Tech", "HealthTech", "EdTech"],
+      "stage": ["Series A", "Series B", "Growth"],
+      "ticket_size": "₹10Cr - ₹100Cr",
+      "portfolio_companies": ["BYJU'S", "Zomato", "Ola", "Freshworks"],
+      "contact_email": "india@sequoiacap.com",
+      "investment_thesis": "We back bold entrepreneurs building category-defining companies. Focus on large market opportunities with strong unit economics.",
+      "source": "VC Directory 2024, Page 12"
+    },
+    {
+      "id": "inv_003",
+      "name": "Chennai Angels",
+      "type": "Angel Network",
+      "location": "Chennai",
+      "state": "Tamil Nadu",
+      "region": "South India",
+      "sectors": ["DeepTech", "SaaS", "HealthTech", "CleanTech"],
+      "stage": ["Pre-Seed", "Seed"],
+      "ticket_size": "₹50L - ₹2Cr",
+      "portfolio_companies": ["Niramai", "Detect Technologies", "Agnikul"],
+      "contact_email": "pitch@chennaiangels.com",
+      "investment_thesis": "Technology-first startups with defensible IP. We value technical founders and deep domain expertise.",
+      "source": "Startup India Database, Page 52"
+    },
+    {
+      "id": "inv_004",
+      "name": "Blume Ventures",
+      "type": "Venture Capital",
+      "location": "Mumbai",
+      "state": "Maharashtra",
+      "region": "West India",
+      "sectors": ["Consumer", "FinTech", "Enterprise SaaS", "HealthTech"],
+      "stage": ["Seed", "Series A"],
+      "ticket_size": "₹2Cr - ₹15Cr",
+      "portfolio_companies": ["Dunzo", "Slice", "Carbon Clean"],
+      "contact_email": "hello@blume.vc",
+      "investment_thesis": "Early-stage focus with founder-first approach. We help build companies from Day 0.",
+      "source": "VC Directory 2024, Page 28"
+    },
+    {
+      "id": "inv_005",
+      "name": "Jaipur Angel Network",
+      "type": "Angel Network",
+      "location": "Jaipur",
+      "state": "Rajasthan",
+      "region": "North India",
+      "sectors": ["Tourism Tech", "AgriTech", "EdTech", "Handicrafts"],
+      "stage": ["Pre-Seed", "Seed"],
+      "ticket_size": "₹10L - ₹50L",
+      "portfolio_companies": ["RuralMart", "CraftConnect", "EduRural"],
+      "contact_email": "connect@jaipurangels.in",
+      "investment_thesis": "Startups solving problems unique to Rajasthan and North India. Strong local network for market access.",
+      "source": "Startup India Database, Page 78"
+    }
+  ],
+  "schemes": [
+    {
+      "id": "sch_001",
+      "name": "Startup India Seed Fund Scheme (SISFS)",
+      "type": "Central Government",
+      "department": "DPIIT, Ministry of Commerce",
+      "funding_amount": "Up to ₹20 Lakhs (Grant) + ₹50 Lakhs (Convertible Debentures)",
+      "eligibility": {
+        "dpiit_registered": true,
+        "age_limit": "Not more than 2 years old",
+        "stage": ["Idea", "Validation", "Early Traction"],
+        "sectors": "All sectors"
+      },
+      "application_process": "Apply through DPIIT registered incubators",
+      "deadline": "Rolling basis",
+      "link": "https://seedfund.startupindia.gov.in",
+      "source": "Startup India Policy 2024, Page 14, Clause 3.1"
+    },
+    {
+      "id": "sch_002",
+      "name": "TanSeed (Tamil Nadu Startup Seed Grant)",
+      "type": "State Government",
+      "state": "Tamil Nadu",
+      "department": "StartupTN",
+      "funding_amount": "Up to ₹10 Lakhs (Grant)",
+      "eligibility": {
+        "state_registered": true,
+        "headquarters": "Tamil Nadu",
+        "age_limit": "Less than 5 years",
+        "stage": ["Prototype", "MVP"],
+        "sectors": "All sectors with preference for manufacturing"
+      },
+      "application_process": "Apply through StartupTN portal",
+      "deadline": "Quarterly cohorts",
+      "link": "https://startuptn.in/tanseed",
+      "source": "Tamil Nadu Startup Policy 2023, Page 8"
+    },
+    {
+      "id": "sch_003",
+      "name": "MUDRA Loan - Shishu Category",
+      "type": "Central Government",
+      "department": "Ministry of Finance",
+      "funding_amount": "Up to ₹50,000 (Loan)",
+      "eligibility": {
+        "business_type": "Micro enterprises",
+        "stage": ["Idea", "Early Stage"],
+        "collateral": "No collateral required"
+      },
+      "application_process": "Apply through any scheduled bank",
+      "deadline": "Always open",
+      "link": "https://www.mudra.org.in",
+      "source": "MUDRA Guidelines 2024, Page 5"
+    },
+    {
+      "id": "sch_004",
+      "name": "Nidhi Prayas (NIDHI-PRAYAS)",
+      "type": "Central Government",
+      "department": "DST (Department of Science & Technology)",
+      "funding_amount": "Up to ₹10 Lakhs (Grant)",
+      "eligibility": {
+        "innovator_type": ["Student", "Faculty", "Individual Innovator"],
+        "stage": ["Idea", "Proof of Concept"],
+        "technology_focus": true
+      },
+      "application_process": "Apply through Technology Business Incubators (TBIs)",
+      "deadline": "Cohort-based",
+      "link": "https://www.nstedb.com/nidhi-prayas",
+      "source": "DST NIDHI Handbook, Page 22"
+    },
+    {
+      "id": "sch_005",
+      "name": "Stand-Up India",
+      "type": "Central Government",
+      "department": "Ministry of Finance",
+      "funding_amount": "₹10 Lakhs to ₹1 Crore (Loan)",
+      "eligibility": {
+        "category": ["SC", "ST", "Women Entrepreneurs"],
+        "business_type": ["Manufacturing", "Services", "Trading"],
+        "stage": ["Greenfield Project"],
+        "ownership": "Minimum 51% by SC/ST/Women"
+      },
+      "application_process": "Apply through designated bank branches",
+      "deadline": "Always open",
+      "link": "https://www.standupmitra.in",
+      "source": "Stand-Up India Guidelines, Page 3"
+    }
+  ],
+  "opportunities": [
+    {
+      "id": "opp_001",
+      "name": "NASSCOM AI Startup Challenge 2025",
+      "type": "Hackathon",
+      "organizer": "NASSCOM",
+      "prize": "₹25 Lakhs + Mentorship + AWS Credits",
+      "deadline": "2025-02-15",
+      "eligibility": {
+        "sectors": ["AI/ML", "DeepTech"],
+        "stage": ["Prototype", "MVP", "Early Revenue"],
+        "team_size": "2-5 members"
+      },
+      "benefits": ["Cash Prize", "Mentorship", "Cloud Credits", "Investor Connect"],
+      "link": "https://challenge.nasscom.in/ai-2025",
+      "source": "NASSCOM Events Calendar"
+    },
+    {
+      "id": "opp_002",
+      "name": "Agri Hackathon - Smart Farming Solutions",
+      "type": "Hackathon",
+      "organizer": "Ministry of Agriculture",
+      "prize": "₹10 Lakhs + Pilot Project with State Government",
+      "deadline": "2025-01-31",
+      "eligibility": {
+        "sectors": ["AgriTech", "IoT", "Rural Tech"],
+        "open_to": ["Students", "Startups", "Innovators"]
+      },
+      "benefits": ["Cash Prize", "Government Contract", "Incubation Support"],
+      "link": "https://agrihackathon.gov.in",
+      "source": "Startup India Events"
+    },
+    {
+      "id": "opp_003",
+      "name": "Google for Startups Accelerator India",
+      "type": "Accelerator",
+      "organizer": "Google",
+      "prize": "Equity-free program + $200K Google Cloud Credits",
+      "deadline": "2025-03-01",
+      "eligibility": {
+        "sectors": ["AI/ML", "Climate Tech", "HealthTech"],
+        "stage": ["Seed", "Series A"],
+        "revenue": "Some traction required"
+      },
+      "benefits": ["Mentorship", "Cloud Credits", "Google Network Access"],
+      "link": "https://startup.google.com/accelerator/india",
+      "source": "Google Startup Programs"
+    },
+    {
+      "id": "opp_004",
+      "name": "Tamil Nadu Student Innovator Program",
+      "type": "Grant",
+      "organizer": "StartupTN",
+      "prize": "₹5 Lakhs Grant + Incubation",
+      "deadline": "2025-02-28",
+      "eligibility": {
+        "category": "Students enrolled in Tamil Nadu colleges",
+        "stage": ["Idea", "Prototype"]
+      },
+      "benefits": ["Grant", "Incubation", "Mentorship", "IP Support"],
+      "link": "https://startuptn.in/student-program",
+      "source": "StartupTN Portal"
+    },
+    {
+      "id": "opp_005",
+      "name": "Climate Finance Innovation Challenge",
+      "type": "Competition",
+      "organizer": "NITI Aayog + World Bank",
+      "prize": "₹50 Lakhs + Implementation Support",
+      "deadline": "2025-04-15",
+      "eligibility": {
+        "sectors": ["CleanTech", "Climate Finance", "Sustainability"],
+        "stage": ["MVP", "Early Revenue"],
+        "impact_focus": true
+      },
+      "benefits": ["Cash Prize", "Policy Advocacy", "Scaling Support"],
+      "link": "https://climate.niti.gov.in/challenge",
+      "source": "NITI Aayog Programs"
+    }
+  ],
+  "locations": {
+    "states": {
+      "Tamil Nadu": {
+        "cities": ["Chennai", "Coimbatore", "Madurai", "Tiruppur", "Salem"],
+        "region": "South India",
+        "startup_hub": "StartupTN",
+        "key_sectors": ["Manufacturing", "Textiles", "IT", "AgriTech"]
+      },
+      "Karnataka": {
+        "cities": ["Bangalore", "Mysore", "Hubli", "Mangalore"],
+        "region": "South India",
+        "startup_hub": "KITS",
+        "key_sectors": ["IT", "Biotech", "Aerospace", "FinTech"]
+      },
+      "Maharashtra": {
+        "cities": ["Mumbai", "Pune", "Nagpur", "Nashik"],
+        "region": "West India",
+        "startup_hub": "Maharashtra Startup Week",
+        "key_sectors": ["FinTech", "Media", "Manufacturing", "Pharma"]
+      },
+      "Rajasthan": {
+        "cities": ["Jaipur", "Udaipur", "Jodhpur", "Kota"],
+        "region": "North India",
+        "startup_hub": "iStart Rajasthan",
+        "key_sectors": ["Tourism Tech", "Handicrafts", "Solar", "EdTech"]
+      }
+    },
+    "regions": ["South India", "North India", "West India", "East India", "Central India"]
+  },
+  "funding_routes": {
+    "idea_stage": [
+      {"step": 1, "action": "Register on DPIIT Portal", "type": "registration"},
+      {"step": 2, "action": "Join an Incubator", "type": "incubation"},
+      {"step": 3, "action": "Apply for Seed Grants", "type": "funding"},
+      {"step": 4, "action": "Build MVP", "type": "milestone"},
+      {"step": 5, "action": "Pitch to Angels", "type": "funding"}
+    ],
+    "mvp_stage": [
+      {"step": 1, "action": "Get DPIIT Recognition", "type": "registration"},
+      {"step": 2, "action": "Apply for Government Schemes", "type": "funding"},
+      {"step": 3, "action": "Join Accelerator Program", "type": "incubation"},
+      {"step": 4, "action": "Raise Angel Round", "type": "funding"}
+    ],
+    "revenue_stage": [
+      {"step": 1, "action": "Prepare Pitch Deck", "type": "milestone"},
+      {"step": 2, "action": "Apply to VC Programs", "type": "funding"},
+      {"step": 3, "action": "Raise Series A", "type": "funding"}
+    ]
+  },
+  "user_profile": {
+    "name": "Demo User",
+    "email": "demo@startup.in",
+    "startup_name": "AgriFlow Tech",
+    "sector": "AgriTech",
+    "stage": "MVP",
+    "location": "Coimbatore",
+    "state": "Tamil Nadu",
+    "team_size": 4,
+    "monthly_revenue": 50000,
+    "dpiit_registered": true
+  }
+}
