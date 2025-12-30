@@ -23,17 +23,11 @@ class Config:
     DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "")
     
-    @classmethod
-    def get_cors_origins(cls) -> list:
-        """Get CORS origins including production frontend URL."""
-        origins = ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"]
-        if cls.FRONTEND_URL:
-            origins.append(cls.FRONTEND_URL)
-        # Support Vercel preview deployments
-        origins.append("https://*.vercel.app")
-        return origins
-    
-    CORS_ORIGINS: list = get_cors_origins.__func__(None)  # type: ignore
+    # CORS Origins - build list directly
+    _cors_origins = ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"]
+    if FRONTEND_URL:
+        _cors_origins.append(FRONTEND_URL)
+    CORS_ORIGINS: list = _cors_origins
     
     @classmethod
     def has_gemini_key(cls) -> bool:
