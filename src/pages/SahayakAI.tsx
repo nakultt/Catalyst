@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, User, Loader2, BookOpen, Globe } from 'lucide-react';
+import { apiUrl } from '../config';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -49,7 +50,7 @@ export default function SahayakAI() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch(apiUrl('/api/chat'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

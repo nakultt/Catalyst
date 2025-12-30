@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { Camera, Eye, Smile, AlertCircle, CheckCircle2, TrendingUp, Loader2, X, FileText, Shield, Building2, LucideIcon } from 'lucide-react';
+import { apiUrl } from '../config';
 
 interface PitchResult {
   success: boolean;
@@ -72,7 +73,7 @@ export default function PitchAnalyzer() {
 
     setIsAnalyzing(true);
     try {
-      const response = await fetch('/api/analyze-pitch', {
+      const response = await fetch(apiUrl('/api/analyze-pitch'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: base64Image }),
@@ -107,7 +108,7 @@ export default function PitchAnalyzer() {
       formData.append('aadhaar', aadhaarFile);
       formData.append('incorporation', incorpFile);
 
-      const response = await fetch('/api/check-eligibility', {
+      const response = await fetch(apiUrl('/api/check-eligibility'), {
         method: 'POST',
         body: formData,
       });

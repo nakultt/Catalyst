@@ -20,8 +20,20 @@ class Config:
     NEO4J_DATABASE: str = os.getenv("NEO4J_DATABASE", "neo4j")
     
     # Application settings
-    DEBUG: bool = os.getenv("DEBUG", "true").lower() == "true"
-    CORS_ORIGINS: list = ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"]
+    DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"
+    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "")
+    
+    @classmethod
+    def get_cors_origins(cls) -> list:
+        """Get CORS origins including production frontend URL."""
+        origins = ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"]
+        if cls.FRONTEND_URL:
+            origins.append(cls.FRONTEND_URL)
+        # Support Vercel preview deployments
+        origins.append("https://*.vercel.app")
+        return origins
+    
+    CORS_ORIGINS: list = get_cors_origins.__func__(None)  # type: ignore
     
     @classmethod
     def has_gemini_key(cls) -> bool:

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search, Filter, Award, ExternalLink, Clock, Loader2, AlertCircle } from 'lucide-react';
+import { apiUrl } from '../config';
 
 interface Opportunity {
   id: string;
@@ -25,7 +26,7 @@ export default function Opportunities() {
   useEffect(() => {
     const fetchOpportunities = async () => {
       try {
-        const response = await fetch('/api/opportunities');
+        const response = await fetch(apiUrl('/api/opportunities'));
         if (!response.ok) throw new Error('Failed to fetch');
         const result = await response.json();
         setOpportunities(result.data || []);

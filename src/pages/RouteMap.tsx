@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { MapPin, Loader2, AlertCircle, Sparkles } from 'lucide-react';
+import { apiUrl } from '../config';
 
 interface RouteNode {
   id: string;
@@ -39,7 +40,7 @@ export default function RouteMap() {
     setError(null);
 
     try {
-      const response = await fetch('/api/route-map', {
+      const response = await fetch(apiUrl('/api/route-map'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ stage, sector, location }),

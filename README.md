@@ -169,11 +169,13 @@ npm run dev
 
 ### Environment Variables
 
-Create a `.env` file in the `backend/` directory:
-
+**Backend** (`backend/.env`):
 ```env
 # Required — AI Features
 GOOGLE_API_KEY=your_gemini_api_key_here
+
+# Production — Your Vercel frontend URL
+FRONTEND_URL=https://your-app.vercel.app
 
 # Optional — Neo4j (for production)
 NEO4J_URI=bolt://localhost:7687
@@ -181,8 +183,40 @@ NEO4J_USERNAME=neo4j
 NEO4J_PASSWORD=your_password
 
 # Application
-DEBUG=true
+DEBUG=false
 ```
+
+**Frontend** (Vercel Environment Variables):
+```env
+VITE_API_URL=https://your-render-backend.onrender.com
+```
+
+---
+
+## ☁️ Deployment
+
+### Deploy to Vercel (Frontend)
+
+1. Push your code to GitHub
+2. Go to [vercel.com](https://vercel.com) → Import your repository
+3. Set **Root Directory** to `.` (root)
+4. Add Environment Variable:
+   - `VITE_API_URL` = `https://your-backend.onrender.com`
+5. Deploy!
+
+### Deploy to Render (Backend)
+
+1. Go to [render.com](https://render.com) → New Web Service
+2. Connect your GitHub repository
+3. Configure:
+   - **Root Directory**: `backend`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+4. Add Environment Variables:
+   - `GOOGLE_API_KEY` = Your Gemini API key
+   - `FRONTEND_URL` = `https://your-app.vercel.app`
+   - `DEBUG` = `false`
+5. Deploy!
 
 ### API Endpoints
 

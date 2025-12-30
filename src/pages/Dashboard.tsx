@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { TrendingUp, Users, Target, DollarSign, ArrowRight, AlertCircle, Loader2, CheckCircle2 } from 'lucide-react';
+import { apiUrl } from '../config';
 
 interface DashboardData {
   funding_probability: number;
@@ -28,7 +29,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const response = await fetch('/api/dashboard');
+        const response = await fetch(apiUrl('/api/dashboard'));
         if (!response.ok) throw new Error('Failed to fetch dashboard');
         const result = await response.json();
         setData(result.data);
