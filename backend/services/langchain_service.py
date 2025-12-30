@@ -323,7 +323,7 @@ def build_context_from_data(query: str) -> tuple[str, list[str], dict]:
     return "\n".join(context_parts), list(set(sources)), {"method": "fallback_keyword"}
 
 
-async def chat_with_citations(user_query: str) -> dict:
+async def chat_with_citations(user_query: str, language: str = "English") -> dict:
     """
     Process user query using GraphRAG and return response with citations.
     
@@ -371,8 +371,9 @@ INSTRUCTIONS:
 3. If the user asked about a city (like Jaipur), mention that you also checked parent regions
 4. Suggest next steps when appropriate
 5. If the data doesn't contain relevant information, say so honestly
+6. **IMPORTANT: Respond entirely in {language} language.**
 
-Answer in a conversational but professional tone:"""
+Answer in a conversational but professional tone in {language}:"""
 
             response = await llm.ainvoke(prompt)
             

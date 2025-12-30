@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from config import config
 
 # Import routers
-from routers import dashboard, chatbot, route_map, pitch, opportunities
+from routers import dashboard, chatbot, route_map, pitch, opportunities, schemes
 
 
 @asynccontextmanager
@@ -56,6 +56,7 @@ app.include_router(chatbot.router)
 app.include_router(route_map.router)
 app.include_router(pitch.router)
 app.include_router(opportunities.router)
+app.include_router(schemes.router)
 
 @app.get("/")
 async def root():
@@ -71,6 +72,7 @@ async def root():
             "route_map": "/api/route-map",
             "pitch_analyzer": "/api/analyze-pitch",
             "opportunities": "/api/opportunities",
+            "scheme_eligibility": "/api/check-eligibility",
             "graph_stats": "/api/graph/stats",
             "graph_sync": "/api/graph/sync"
         },

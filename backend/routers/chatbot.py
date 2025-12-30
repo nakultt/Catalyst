@@ -10,6 +10,7 @@ router = APIRouter(prefix="/api", tags=["chatbot"])
 
 class ChatRequest(BaseModel):
     message: str
+    language: str = "English"
     conversation_id: str | None = None
 
 class ChatResponse(BaseModel):
@@ -28,7 +29,7 @@ async def chat(request: ChatRequest):
     - "What government schemes am I eligible for?"
     - "What hackathons can I participate in?"
     """
-    result = await chat_with_citations(request.message)
+    result = await chat_with_citations(request.message, request.language)
     return ChatResponse(
         success=True,
         answer=result["answer"],

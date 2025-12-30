@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, User, Loader2, BookOpen } from 'lucide-react';
+import { Send, Sparkles, User, Loader2, BookOpen, Globe } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -7,6 +7,16 @@ interface Message {
   sources?: string[];
   context_used?: boolean;
 }
+
+const LANGUAGES = [
+  { code: 'English', label: 'English', flag: '🇺🇸' },
+  { code: 'Hindi', label: 'Hindi (हिंदी)', flag: '🇮🇳' },
+  { code: 'Tamil', label: 'Tamil (தமிழ்)', flag: '🇮🇳' },
+  { code: 'Telugu', label: 'Telugu (తెలుగు)', flag: '🇮🇳' },
+  { code: 'Kannada', label: 'Kannada (ಕನ್ನಡ)', flag: '🇮🇳' },
+  { code: 'Marathi', label: 'Marathi (मराठी)', flag: '🇮🇳' },
+  { code: 'Bengali', label: 'Bengali (বাংলা)', flag: '🇮🇳' },
+];
 
 export default function SahayakAI() {
   const [messages, setMessages] = useState<Message[]>([
@@ -17,6 +27,9 @@ export default function SahayakAI() {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [language, setLanguage] = useState('English');
+  const [showLangMenu, setShowLangMenu] = useState(false);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -41,7 +54,10 @@ export default function SahayakAI() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify({ 
+          message: userMessage,
+          language: language
+        }),
       });
 
       if (!response.ok) {
@@ -82,9 +98,41 @@ export default function SahayakAI() {
           </h1>
           <p className="text-slate-500 mt-1">Your intelligent funding ecosystem guide</p>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 rounded-full border border-green-100">
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-          <span className="text-sm font-medium text-green-700">Online</span>
+        <div className="flex items-center gap-4">
+          <div className="relative">
+             <button 
+               onClick={() => setShowLangMenu(!showLangMenu)}
+               className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all text-slate-700 font-medium"
+             >
+               <Globe className="w-4 h-4 text-slate-500" />
+               <span>{language}</span>
+             </button>
+             
+             {showLangMenu && (
+               <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-slate-100 rounded-xl shadow-xl z-50 overflow-hidden">
+                 {LANGUAGES.map((lang) => (
+                   <button
+                     key={lang.code}
+                     onClick={() => {
+                       setLanguage(lang.code);
+                       setShowLangMenu(false);
+                     }}
+                     className={`w-full text-left px-4 py-3 text-sm hover:bg-slate-50 flex items-center gap-3 transition-colors ${
+                       language === lang.code ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-600'
+                     }`}
+                   >
+                     <span>{lang.flag}</span>
+                     {lang.label}
+                   </button>
+                 ))}
+               </div>
+             )}
+          </div>
+
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 rounded-full border border-green-100">
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            <span className="text-sm font-medium text-green-700">Online</span>
+          </div>
         </div>
       </div>
 
