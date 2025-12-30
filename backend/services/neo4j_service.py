@@ -64,10 +64,13 @@ def clear_validator_data():
         return False
 
 
-def sync_to_neo4j():
+def sync_to_neo4j(force: bool = False):
     """
     Sync seed data to Neo4j as a Knowledge Graph.
     Creates nodes and relationships with Validator_ prefix.
+    
+    Args:
+        force: If True, clears existing data and re-syncs. If False, skips if data exists.
     
     Graph Schema:
     - Validator_Region (name)
@@ -90,6 +93,22 @@ def sync_to_neo4j():
     if not driver:
         print("⚠️ Neo4j not available, skipping sync")
         return False
+    
+    # Check if data already exists (skip sync if it does, unless forced)
+    try:
+        with driver.session(database=config.NEO4J_DATABASE) as session:
+            result = session.run("""
+                MATCH (n)
+                WHERE any(label IN labels(n) WHERE label STARTS WITH 'Validator_')
+                RETURN count(n) as count
+            """)
+            existing_count = result.single()["count"]
+            
+            if existing_count > 0 and not force:
+                print(f"✅ Neo4j already has {existing_count} nodes. Skipping sync (use force=True to re-sync)")
+                return True
+    except Exception as e:
+        print(f"Error checking existing data: {e}")
     
     data = get_data()
     

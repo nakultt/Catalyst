@@ -1,350 +1,215 @@
-/**
- * Opportunities Page - Opportunity Radar
- * Lists active grants, hackathons, accelerators with apply functionality
- */
 import { useState, useEffect } from 'react';
-import { 
-  Sparkles, 
-  Calendar, 
-  Trophy, 
-  ExternalLink, 
-  X, 
-  Loader2,
-  Filter,
-  CheckCircle2,
-} from 'lucide-react';
-import { getOpportunities, getUserProfile, submitApplication, type Opportunity, type UserProfile } from '../lib/api';
+import { Search, Filter, Award, ExternalLink, Clock, Loader2, AlertCircle } from 'lucide-react';
 
-interface ApplyModalProps {
-  opportunity: Opportunity;
-  userProfile: UserProfile;
-  onClose: () => void;
-  onSuccess: (applicationId: string) => void;
+interface Opportunity {
+  id: string;
+  name: string;
+  organizer: string;
+  type: string;
+  deadline: string;
+  prize: string;
+  benefits: string[];
+  sector: string;
+  link?: string;
 }
 
-function ApplyModal({ opportunity, userProfile, onClose, onSuccess }: ApplyModalProps) {
-  const [name, setName] = useState(userProfile.name);
-  const [email, setEmail] = useState(userProfile.email);
-  const [startupName, setStartupName] = useState(userProfile.startup_name);
-  const [pitch, setPitch] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      const response = await submitApplication(
-        opportunity.id,
-        name,
-        email,
-        startupName,
-        pitch
-      );
-      onSuccess(response.application_id);
-    } catch (error) {
-      console.error('Application error:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
-
-  return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="p-6 border-b border-dark-600">
-          <div className="flex items-start justify-between">
-            <div>
-              <h3 className="text-xl font-semibold text-white">Apply for {opportunity.name}</h3>
-              <p className="text-dark-400 text-sm mt-1">Organized by {opportunity.organizer}</p>
-            </div>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-dark-700 rounded-lg transition-colors"
-            >
-              <X className="w-5 h-5 text-dark-400" />
-            </button>
-          </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-dark-300 mb-2">Your Name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="input-dark w-full"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-dark-300 mb-2">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="input-dark w-full"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-dark-300 mb-2">Startup Name</label>
-            <input
-              type="text"
-              value={startupName}
-              onChange={(e) => setStartupName(e.target.value)}
-              className="input-dark w-full"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-dark-300 mb-2">Why should you be selected?</label>
-            <textarea
-              value={pitch}
-              onChange={(e) => setPitch(e.target.value)}
-              className="input-dark w-full h-32 resize-none"
-              placeholder="Tell us about your startup and why you're a good fit..."
-              required
-            />
-          </div>
-          <div className="flex gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-3 bg-dark-700 hover:bg-dark-600 rounded-xl text-white transition-colors flex-1"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="btn-gradient flex-1 flex items-center justify-center gap-2"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Submitting...
-                </>
-              ) : (
-                'Submit Application'
-              )}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-function SuccessModal({ applicationId, onClose }: { applicationId: string; onClose: () => void }) {
-  return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-content max-w-sm" onClick={(e) => e.stopPropagation()}>
-        <div className="p-8 text-center">
-          <div className="w-16 h-16 rounded-full bg-success-500/20 flex items-center justify-center mx-auto mb-4">
-            <CheckCircle2 className="w-8 h-8 text-success-400" />
-          </div>
-          <h3 className="text-xl font-semibold text-white">Application Submitted!</h3>
-          <p className="text-dark-400 mt-2">Your application ID is:</p>
-          <p className="text-primary-400 font-mono text-lg mt-1">{applicationId}</p>
-          <p className="text-dark-500 text-sm mt-4">You will receive a confirmation email shortly.</p>
-          <button onClick={onClose} className="btn-gradient w-full mt-6">
-            <span>Close</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-interface OpportunityCardProps {
-  opportunity: Opportunity;
-  onApply: (opp: Opportunity) => void;
-}
-
-function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
-  const daysLeft = Math.ceil(
-    (new Date(opportunity.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
-  );
-  const isUrgent = daysLeft <= 7;
-
-  return (
-    <div className="glass-card p-6 hover:translate-y-[-2px] transition-transform animate-slide-up">
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
-            <Trophy className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <span className={`badge ${opportunity.type === 'Hackathon' ? 'badge-primary' : opportunity.type === 'Grant' ? 'badge-success' : 'badge-warning'}`}>
-              {opportunity.type}
-            </span>
-          </div>
-        </div>
-        {isUrgent && (
-          <span className="badge badge-error animate-pulse">
-            {daysLeft} days left!
-          </span>
-        )}
-      </div>
-
-      <h3 className="text-lg font-semibold text-white mb-2">{opportunity.name}</h3>
-      <p className="text-dark-400 text-sm mb-4">by {opportunity.organizer}</p>
-
-      <div className="space-y-2 mb-4">
-        <div className="flex items-center gap-2 text-sm">
-          <Trophy className="w-4 h-4 text-warning-400" />
-          <span className="text-dark-300">{opportunity.prize}</span>
-        </div>
-        <div className="flex items-center gap-2 text-sm">
-          <Calendar className="w-4 h-4 text-primary-400" />
-          <span className="text-dark-300">Deadline: {new Date(opportunity.deadline).toLocaleDateString()}</span>
-        </div>
-      </div>
-
-      <div className="flex flex-wrap gap-2 mb-4">
-        {opportunity.benefits.slice(0, 3).map((benefit, idx) => (
-          <span key={idx} className="px-2 py-1 bg-dark-800 rounded-lg text-xs text-dark-300">
-            {benefit}
-          </span>
-        ))}
-      </div>
-
-      <div className="flex gap-3">
-        <button
-          onClick={() => onApply(opportunity)}
-          className="btn-gradient flex-1"
-        >
-          <span>Apply Now</span>
-        </button>
-        <a
-          href={opportunity.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="px-4 py-2 bg-dark-700 hover:bg-dark-600 rounded-xl text-dark-300 transition-colors flex items-center gap-2"
-        >
-          <ExternalLink className="w-4 h-4" />
-        </a>
-      </div>
-    </div>
-  );
-}
-
-export function Opportunities() {
+export default function Opportunities() {
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<string>('all');
-  const [selectedOpportunity, setSelectedOpportunity] = useState<Opportunity | null>(null);
-  const [successApplicationId, setSuccessApplicationId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedType, setSelectedType] = useState('All');
+  const [selectedSector, setSelectedSector] = useState('All');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [aiInsight, setAiInsight] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchData() {
+    const fetchOpportunities = async () => {
       try {
-        const [opps, profile] = await Promise.all([
-          getOpportunities(),
-          getUserProfile()
-        ]);
-        setOpportunities(opps);
-        setUserProfile(profile);
-      } catch (error) {
-        console.error('Failed to load opportunities:', error);
+        const response = await fetch('/api/opportunities');
+        if (!response.ok) throw new Error('Failed to fetch');
+        const result = await response.json();
+        setOpportunities(result.data || []);
+        setAiInsight(result.ai_insight || null);
+      } catch (err) {
+        setError('Unable to load opportunities.');
+        console.error(err);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
-    }
-    fetchData();
+    };
+    fetchOpportunities();
   }, []);
 
-  const filteredOpportunities = filter === 'all' 
-    ? opportunities 
-    : opportunities.filter(o => o.type.toLowerCase() === filter);
+  const filteredOpportunities = opportunities.filter((opp) => {
+    if (selectedType !== 'All' && opp.type !== selectedType) return false;
+    if (selectedSector !== 'All' && opp.sector !== selectedSector && opp.sector !== 'All Sectors') return false;
+    if (searchTerm && !opp.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+    return true;
+  });
 
-  const handleApplySuccess = (applicationId: string) => {
-    setSelectedOpportunity(null);
-    setSuccessApplicationId(applicationId);
+  const getUrgencyColor = (deadline: string) => {
+    if (!deadline || deadline === 'Rolling') return 'text-slate-400';
+    const daysLeft = Math.ceil((new Date(deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+    if (daysLeft <= 7) return 'text-red-500';
+    if (daysLeft <= 15) return 'text-yellow-600';
+    return 'text-green-600';
   };
 
-  if (loading) {
+  const getTypeColor = (type: string) => {
+    const colors: Record<string, string> = {
+      Hackathon: 'bg-purple-50 text-purple-700 border-purple-100',
+      Grant: 'bg-green-50 text-green-700 border-green-100',
+      Challenge: 'bg-blue-50 text-blue-700 border-blue-100',
+      Accelerator: 'bg-orange-50 text-orange-700 border-orange-100',
+    };
+    return colors[type] || 'bg-slate-50 text-slate-600 border-slate-100';
+  };
+
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="max-w-7xl mx-auto flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-primary-500 animate-spin mx-auto" />
-          <p className="text-dark-400 mt-4">Loading opportunities...</p>
+          <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-slate-500 font-medium">Loading opportunities...</p>
         </div>
       </div>
     );
   }
 
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto flex items-center justify-center min-h-[60vh]">
+        <div className="bg-white p-8 rounded-2xl text-center shadow-lg border border-slate-100">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <p className="text-slate-700 font-medium">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const uniqueTypes = ['All', ...new Set(opportunities.map(o => o.type).filter(Boolean))];
+  const uniqueSectors = ['All', ...new Set(opportunities.map(o => o.sector).filter(Boolean))];
+
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between animate-fade-in">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-warning-500 to-error-500 flex items-center justify-center">
-            <Sparkles className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-display font-bold text-white">Opportunity Radar</h1>
-            <p className="text-dark-400 text-sm">Active grants, hackathons, and accelerators</p>
+    <div className="max-w-7xl mx-auto space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold text-slate-900 mb-1">Opportunities Radar</h1>
+        <p className="text-slate-500">Discover hackathons, grants, internships & accelerators</p>
+      </div>
+
+      {aiInsight && (
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-5">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center flex-shrink-0">
+              <span className="text-white text-sm">🤖</span>
+            </div>
+            <div>
+              <p className="text-xs text-blue-600 font-medium mb-1 uppercase tracking-wider">AI Recommendation</p>
+              <p className="text-slate-700">{aiInsight}</p>
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-dark-400" />
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="input-dark py-2"
-          >
-            <option value="all">All Types</option>
-            <option value="hackathon">Hackathons</option>
-            <option value="grant">Grants</option>
-            <option value="accelerator">Accelerators</option>
-            <option value="competition">Competitions</option>
-          </select>
+      )}
+
+      <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search opportunities..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all"
+            />
+          </div>
+          <div className="flex gap-3">
+            <select
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value)}
+              className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all"
+            >
+              {uniqueTypes.map(t => <option key={t} value={t}>{t === 'All' ? 'All Types' : t}</option>)}
+            </select>
+            <select
+              value={selectedSector}
+              onChange={(e) => setSelectedSector(e.target.value)}
+              className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all"
+            >
+              {uniqueSectors.map(s => <option key={s} value={s}>{s === 'All' ? 'All Sectors' : s}</option>)}
+            </select>
+          </div>
         </div>
       </div>
 
-      {/* Opportunities Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredOpportunities.map((opp, index) => (
-          <div key={opp.id} className={`stagger-${(index % 5) + 1}`}>
-            <OpportunityCard
-              opportunity={opp}
-              onApply={setSelectedOpportunity}
-            />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {filteredOpportunities.map((opp) => (
+          <div
+            key={opp.id}
+            className="bg-white rounded-xl p-6 border border-slate-100 shadow-sm hover:shadow-lg transition-all group"
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${getTypeColor(opp.type)}`}>
+                    {opp.type}
+                  </span>
+                </div>
+                <h3 className="text-lg font-semibold text-slate-800 mb-1 group-hover:text-blue-600 transition-colors">
+                  {opp.name}
+                </h3>
+                <p className="text-sm text-slate-500">{opp.organizer}</p>
+              </div>
+              <Award className="w-6 h-6 text-slate-300 group-hover:text-blue-500 transition-colors" />
+            </div>
+
+            <div className={`flex items-center gap-2 mb-4 ${getUrgencyColor(opp.deadline)}`}>
+              <Clock className="w-4 h-4" />
+              <span className="text-sm font-medium">
+                {!opp.deadline || opp.deadline === 'Rolling' ? 'Rolling Deadline' : `Deadline: ${opp.deadline}`}
+              </span>
+            </div>
+
+            {opp.prize && (
+              <div className="mb-4">
+                <p className="text-xs text-slate-400 mb-1 uppercase tracking-wider">Prize</p>
+                <p className="text-sm text-slate-700 font-medium">{opp.prize}</p>
+              </div>
+            )}
+
+            {opp.benefits && opp.benefits.length > 0 && (
+              <div className="mb-5">
+                <p className="text-xs text-slate-400 mb-2 uppercase tracking-wider">Benefits</p>
+                <div className="flex flex-wrap gap-2">
+                  {opp.benefits.map((benefit, i) => (
+                    <span
+                      key={i}
+                      className="px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-lg text-xs text-slate-600"
+                    >
+                      {benefit}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <button 
+              onClick={() => opp.link && window.open(opp.link, '_blank')}
+              className="w-full px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-md hover:shadow-blue-200 text-white rounded-xl transition-all font-medium flex items-center justify-center gap-2"
+            >
+              Apply Now
+              <ExternalLink className="w-4 h-4" />
+            </button>
           </div>
         ))}
       </div>
 
       {filteredOpportunities.length === 0 && (
-        <div className="text-center py-12">
-          <Sparkles className="w-12 h-12 text-dark-500 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-dark-300">No opportunities found</h3>
-          <p className="text-dark-500 mt-2">Try changing the filter or check back later.</p>
+        <div className="bg-white rounded-xl p-16 text-center border border-slate-100 shadow-sm">
+          <Filter className="w-14 h-14 text-slate-300 mx-auto mb-4" />
+          <p className="text-slate-500 text-lg">No opportunities found matching your filters</p>
         </div>
-      )}
-
-      {/* Apply Modal */}
-      {selectedOpportunity && userProfile && (
-        <ApplyModal
-          opportunity={selectedOpportunity}
-          userProfile={userProfile}
-          onClose={() => setSelectedOpportunity(null)}
-          onSuccess={handleApplySuccess}
-        />
-      )}
-
-      {/* Success Modal */}
-      {successApplicationId && (
-        <SuccessModal
-          applicationId={successApplicationId}
-          onClose={() => setSuccessApplicationId(null)}
-        />
       )}
     </div>
   );
 }
-
-export default Opportunities;

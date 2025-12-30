@@ -27,7 +27,7 @@ def get_llm():
         try:
             from langchain_google_genai import ChatGoogleGenerativeAI
             _llm = ChatGoogleGenerativeAI(
-                model="gemini-1.5-flash",
+                model="gemini-2.5-flash",
                 google_api_key=config.GOOGLE_API_KEY,
                 temperature=0.7,
                 max_output_tokens=1024
@@ -65,10 +65,18 @@ def build_context_from_knowledge_graph(query: str) -> tuple[str, list[str], dict
     2. Use KG to find entities with relationship traversal
     3. Format results for LLM context
     """
+    print(f"\n{'='*60}")
+    print(f"🧠 GRAPHRAG QUERY PROCESSING")
+    print(f"{'='*60}")
+    print(f"📝 User Query: \"{query}\"")
+    
     kg = get_kg()
     if not kg:
+        print("⚠️  Knowledge Graph not available, using fallback")
         # Fallback to basic data loader if KG fails
         return build_context_from_data(query)
+    
+    print(f"✅ Knowledge Graph connected: {len(kg.entities)} entities loaded")
     
     query_lower = query.lower()
     context_parts = []
@@ -328,9 +336,20 @@ async def chat_with_citations(user_query: str) -> dict:
     # Build context using Knowledge Graph
     context, sources, graph_results = build_context_from_knowledge_graph(user_query)
     
+    print(f"\n📊 CONTEXT BUILT:")
+    print(f"   • Method: {graph_results.get('method', 'unknown')}")
+    print(f"   • Entities found: {graph_results.get('entities_found', 0)}")
+    print(f"   • Relationships traversed: {graph_results.get('relationships_traversed', 0)}")
+    print(f"   • Sources: {sources[:3] if sources else 'None'}")
+    
     llm = get_llm()
     
     if llm and context:
+        print(f"\n🤖 LANGCHAIN LLM INVOCATION:")
+        print(f"   • Model: Gemini 2.5 Flash")
+        print(f"   • Context length: {len(context)} chars")
+        print(f"   • Generating response...")
+        
         # Use Gemini for intelligent response
         try:
             prompt = f"""You are Sahayak, an AI assistant helping Indian startup founders with funding advice.
@@ -358,10 +377,13 @@ Answer in a conversational but professional tone:"""
             response = await llm.ainvoke(prompt)
             
             answer = response.content
+            print(f"   ✅ Response generated ({len(answer)} chars)")
             
             # Ensure sources are included if not in response
             if sources and "[Source:" not in answer:
                 answer += "\n\n**📄 Sources:** " + ", ".join([f"[{s}]" for s in sources[:3]])
+            
+            print(f"{'='*60}\n")
             
             return {
                 "answer": answer,
@@ -370,7 +392,7 @@ Answer in a conversational but professional tone:"""
                 "graph_stats": graph_results
             }
         except Exception as e:
-            print(f"Gemini error: {e}")
+            print(f"   ❌ Gemini error: {e}")
     
     # Fallback: Rule-based response using the context
     if context:

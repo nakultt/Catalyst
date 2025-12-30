@@ -175,8 +175,37 @@ def generate_funding_route(
         "style": {"stroke": "#22C55E"}
     })
     
+    # Generate AI-powered summary if available
+    ai_summary = None
+    try:
+        from services.langchain_service import get_llm
+        llm = get_llm()
+        if llm:
+            import asyncio
+            # Create prompt for AI insights
+            prompt = f"""You are a startup funding advisor. A {sector} startup at {stage} stage in {location} is looking for funding.
+
+Based on the following route steps, provide a 2-3 sentence personalized summary with specific actionable advice:
+
+Steps in their journey:
+{chr(10).join([f"- {n['data']['label']}" for n in nodes])}
+
+Keep it concise, specific, and encouraging. Focus on what they should prioritize first."""
+
+            # Run async in sync context
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                response = loop.run_until_complete(llm.ainvoke(prompt))
+                ai_summary = response.content
+            finally:
+                loop.close()
+    except Exception as e:
+        print(f"AI summary generation failed: {e}")
+    
     return {
         "nodes": nodes,
         "edges": edges,
-        "summary": f"Generated {len(nodes)} step funding route for {sector} startup in {location}"
+        "summary": ai_summary or f"Generated {len(nodes)} step funding route for {sector} startup in {location}. Follow the steps in order for the best results.",
+        "ai_powered": ai_summary is not None
     }

@@ -24,16 +24,60 @@ class ApplicationResponse(BaseModel):
 async def list_opportunities(sector: str | None = None, opp_type: str | None = None):
     """
     Get list of active opportunities (hackathons, grants, accelerators).
+    Now with AI-powered match scores and recommendations.
     
     Query params:
     - sector: Filter by sector (e.g., "AI/ML", "AgriTech")
     - opp_type: Filter by type (e.g., "Hackathon", "Grant")
     """
     opportunities = get_opportunities(sector=sector, opp_type=opp_type)
+    user_profile = get_user_profile()
+    
+    # Calculate match scores based on user profile
+    for opp in opportunities:
+        score = 70  # Base score
+        opp_sectors = opp.get("eligibility", {}).get("sectors", [])
+        
+        # Boost if user sector matches
+        if user_profile.get("sector") in opp_sectors or not opp_sectors:
+            score += 15
+        # Boost if user has required stage
+        opp_stages = opp.get("eligibility", {}).get("stage", [])
+        if user_profile.get("stage") in opp_stages or not opp_stages:
+            score += 10
+        # Boost if DPIIT registered
+        if user_profile.get("dpiit_registered"):
+            score += 5
+            
+        opp["match_score"] = min(score, 98)
+    
+    # Sort by match score descending
+    opportunities.sort(key=lambda x: x.get("match_score", 0), reverse=True)
+    
+    # Generate AI recommendation if available
+    ai_insight = None
+    try:
+        from services.langchain_service import get_llm
+        llm = get_llm()
+        if llm and opportunities:
+            top_3 = opportunities[:3]
+            prompt = f"""You are a startup advisor. Based on the user's profile ({user_profile.get('sector')} startup at {user_profile.get('stage')} stage), provide ONE sentence of advice about which of these opportunities they should prioritize:
+
+{chr(10).join([f"- {o['name']} ({o['type']}): {o.get('prize', 'N/A')}" for o in top_3])}
+
+Keep it under 50 words, specific and actionable."""
+
+            response = await llm.ainvoke(prompt)
+            ai_insight = response.content
+    except Exception as e:
+        print(f"AI insight generation failed: {e}")
+    
     return {
         "success": True,
         "data": opportunities,
-        "total": len(opportunities)
+        "total": len(opportunities),
+        "ai_insight": ai_insight,
+        "ai_powered": ai_insight is not None
     }
 
 @router.get("/user-profile")

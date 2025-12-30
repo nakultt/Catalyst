@@ -1,190 +1,185 @@
-/**
- * Route Map Page - Visual Funding Navigator
- * React Flow-based dynamic funding roadmap generator
- */
-import { useState, useCallback } from 'react';
-import {
-  ReactFlow,
-  Background,
-  Controls,
-  MiniMap,
-  useNodesState,
-  useEdgesState,
-  type Node,
-  type Edge,
-} from '@xyflow/react';
-import '@xyflow/react/dist/style.css';
-import { Map, Loader2, Sparkles, ArrowRight } from 'lucide-react';
-import { generateRouteMap } from '../lib/api';
+import { useState } from 'react';
+import { MapPin, Loader2, AlertCircle, Sparkles } from 'lucide-react';
 
-const STAGES = ['Idea', 'Prototype', 'MVP', 'Revenue', 'Growth'];
-const SECTORS = ['AgriTech', 'FinTech', 'HealthTech', 'EdTech', 'SaaS', 'DeepTech', 'CleanTech', 'Consumer'];
-const LOCATIONS = ['Coimbatore', 'Chennai', 'Bangalore', 'Mumbai', 'Jaipur', 'Pune', 'Hyderabad', 'Delhi'];
+interface RouteNode {
+  id: string;
+  data: { label: string; description?: string };
+  position: { x: number; y: number };
+  type?: string;
+}
 
-export function RouteMap() {
-  const [stage, setStage] = useState('Idea');
-  const [sector, setSector] = useState('AgriTech');
-  const [location, setLocation] = useState('Coimbatore');
+interface RouteEdge {
+  id: string;
+  source: string;
+  target: string;
+}
+
+interface RouteMapData {
+  nodes: RouteNode[];
+  edges: RouteEdge[];
+  summary: string;
+  ai_powered?: boolean;
+}
+
+export default function RouteMap() {
+  const [stage, setStage] = useState('');
+  const [sector, setSector] = useState('');
+  const [location, setLocation] = useState('');
+  const [routeData, setRouteData] = useState<RouteMapData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [generated, setGenerated] = useState(false);
-  const [summary, setSummary] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+  const handleGenerate = async () => {
+    if (!stage || !sector || !location) {
+      setError('Please fill in all fields');
+      return;
+    }
 
-  const handleGenerate = useCallback(async () => {
     setIsLoading(true);
+    setError(null);
+
     try {
-      const result = await generateRouteMap(stage, sector, location);
-      setNodes(result.nodes as Node[]);
-      setEdges(result.edges as Edge[]);
-      setSummary(result.summary);
-      setGenerated(true);
-    } catch (error) {
-      console.error('Failed to generate route map:', error);
+      const response = await fetch('/api/route-map', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stage, sector, location }),
+      });
+
+      if (!response.ok) throw new Error('Failed to generate route');
+      const data = await response.json();
+      setRouteData(data);
+    } catch (err) {
+      console.error('Route generation error:', err);
+      setError('Failed to generate route map. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  }, [stage, sector, location, setNodes, setEdges]);
+  };
+
+  const sortedNodes = routeData?.nodes
+    ?.slice()
+    .sort((a, b) => a.position.y - b.position.y) || [];
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4 animate-fade-in">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent-500 to-primary-500 flex items-center justify-center">
-          <Map className="w-6 h-6 text-white" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-display font-bold text-white">Funding Route Map</h1>
-          <p className="text-dark-400 text-sm">Generate your personalized step-by-step funding roadmap</p>
-        </div>
+    <div className="max-w-5xl mx-auto space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold text-slate-900 mb-1">Funding Route Map</h1>
+        <p className="text-slate-500">Get personalized step-by-step funding guidance</p>
       </div>
 
-      {/* Form */}
-      <div className="glass-card p-6 animate-slide-up">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="glass-card rounded-xl p-8 border border-slate-100">
+        <h2 className="text-lg font-semibold text-slate-800 mb-6">Tell us about your startup</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           <div>
-            <label className="block text-sm font-medium text-dark-300 mb-2">Stage</label>
+            <label className="block text-sm font-medium text-slate-600 mb-2">Startup Stage</label>
             <select
               value={stage}
               onChange={(e) => setStage(e.target.value)}
-              className="input-dark w-full"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all"
             >
-              {STAGES.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
+              <option value="">Select stage</option>
+              <option value="Idea">Idea Stage</option>
+              <option value="MVP">MVP Ready</option>
+              <option value="Revenue">Revenue Stage</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-dark-300 mb-2">Sector</label>
+            <label className="block text-sm font-medium text-slate-600 mb-2">Sector</label>
             <select
               value={sector}
               onChange={(e) => setSector(e.target.value)}
-              className="input-dark w-full"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all"
             >
-              {SECTORS.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
+              <option value="">Select sector</option>
+              <option value="HealthTech">HealthTech</option>
+              <option value="FinTech">FinTech</option>
+              <option value="EdTech">EdTech</option>
+              <option value="AgriTech">AgriTech</option>
+              <option value="SaaS">SaaS</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-dark-300 mb-2">Location</label>
+            <label className="block text-sm font-medium text-slate-600 mb-2">Location</label>
             <select
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="input-dark w-full"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all"
             >
-              {LOCATIONS.map((l) => (
-                <option key={l} value={l}>{l}</option>
-              ))}
+              <option value="">Select location</option>
+              <option value="Bangalore">Bangalore</option>
+              <option value="Delhi">Delhi NCR</option>
+              <option value="Mumbai">Mumbai</option>
+              <option value="Hyderabad">Hyderabad</option>
+              <option value="Pune">Pune</option>
             </select>
           </div>
-          <div className="flex items-end">
-            <button
-              onClick={handleGenerate}
-              disabled={isLoading}
-              className="btn-gradient w-full flex items-center justify-center gap-2"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Generating...</span>
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4" />
-                  <span>Generate Route</span>
-                </>
-              )}
-            </button>
+        </div>
+
+        {error && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-lg flex items-center gap-2 text-red-600 text-sm">
+            <AlertCircle className="w-4 h-4" />
+            {error}
+          </div>
+        )}
+
+        <button
+          onClick={handleGenerate}
+          disabled={isLoading}
+          className="mt-6 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-lg hover:shadow-blue-200 text-white rounded-xl transition-all font-medium disabled:opacity-50 flex items-center gap-2"
+        >
+          {isLoading && <Loader2 className="w-5 h-5 animate-spin" />}
+          {isLoading ? 'Generating...' : 'Generate Route Map'}
+        </button>
+      </div>
+
+      {routeData ? (
+        <div className="glass-card rounded-xl p-8 border border-slate-100">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-semibold text-slate-800">Your Personalized Route</h2>
+            {routeData.ai_powered && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-600 text-xs font-medium rounded-full border border-blue-100">
+                <Sparkles className="w-3 h-3" />
+                AI Powered
+              </span>
+            )}
+          </div>
+          <p className="text-slate-600 mb-8 bg-slate-50 p-4 rounded-lg border border-slate-100">{routeData.summary}</p>
+
+          <div className="relative">
+            {sortedNodes.map((node, index) => (
+              <div key={node.id} className="relative">
+                {index < sortedNodes.length - 1 && (
+                  <div className="absolute left-6 top-16 w-0.5 h-[calc(100%-1rem)] bg-gradient-to-b from-blue-500 to-indigo-500" />
+                )}
+                <div className="flex gap-6 mb-6">
+                  <div className="relative flex-shrink-0">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-200">
+                      {index + 1}
+                    </div>
+                    {index === 0 && (
+                      <div className="absolute -inset-1 rounded-full border-2 border-blue-400 animate-ping opacity-50" />
+                    )}
+                  </div>
+                  <div className="flex-1 bg-slate-50 border border-slate-100 rounded-xl p-5 hover:shadow-md transition-all">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="text-base font-semibold text-slate-800">{node.data.label}</h3>
+                      <MapPin className="w-5 h-5 text-blue-500" />
+                    </div>
+                    {node.data.description && (
+                      <p className="text-sm text-slate-500">{node.data.description}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
-
-      {/* React Flow Canvas */}
-      <div className="glass-card overflow-hidden" style={{ height: '500px' }}>
-        {!generated ? (
-          <div className="h-full flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-20 h-20 rounded-2xl bg-dark-800 flex items-center justify-center mx-auto mb-4">
-                <Map className="w-10 h-10 text-dark-500" />
-              </div>
-              <h3 className="text-lg font-semibold text-dark-300">No Route Generated Yet</h3>
-              <p className="text-dark-500 mt-2 max-w-md">
-                Select your startup stage, sector, and location, then click "Generate Route" to see your personalized funding roadmap.
-              </p>
-              <div className="flex items-center justify-center gap-2 mt-6 text-dark-400">
-                <span>Start</span>
-                <ArrowRight className="w-4 h-4" />
-                <span>DPIIT</span>
-                <ArrowRight className="w-4 h-4" />
-                <span>Scheme</span>
-                <ArrowRight className="w-4 h-4" />
-                <span>Investor</span>
-                <ArrowRight className="w-4 h-4" />
-                <span>Funded!</span>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            fitView
-            attributionPosition="bottom-left"
-          >
-            <Background color="#4B5563" gap={20} size={1} />
-            <Controls />
-            <MiniMap
-              nodeColor="#6366F1"
-              maskColor="rgba(0, 0, 0, 0.8)"
-              style={{ backgroundColor: '#1F2937' }}
-            />
-          </ReactFlow>
-        )}
-      </div>
-
-      {/* Summary */}
-      {generated && summary && (
-        <div className="glass-card p-6 animate-slide-up">
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-lg bg-success-500/20 flex items-center justify-center flex-shrink-0">
-              <Sparkles className="w-4 h-4 text-success-400" />
-            </div>
-            <div>
-              <h4 className="font-semibold text-white">Route Summary</h4>
-              <p className="text-dark-400 mt-1">{summary}</p>
-              <p className="text-dark-500 text-sm mt-2">
-                Click and drag nodes to rearrange. Use scroll to zoom, and drag the canvas to pan.
-              </p>
-            </div>
-          </div>
+      ) : (
+        <div className="glass-card rounded-xl p-16 text-center border border-slate-100">
+          <MapPin className="w-14 h-14 text-slate-300 mx-auto mb-4" />
+          <p className="text-slate-500 text-lg">Fill in your details above to generate your personalized funding route</p>
         </div>
       )}
     </div>
   );
 }
-
-export default RouteMap;

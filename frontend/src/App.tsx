@@ -1,25 +1,28 @@
-/**
- * Validator - AI-Powered Startup Funding Assistant
- * Main Application Entry
- */
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AppLayout } from './components/layout';
-import { Dashboard, Chatbot, RouteMap, PitchAnalyzer, Opportunities } from './pages';
-import './index.css';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Sidebar from './components/Sidebar';
+import Dashboard from './pages/Dashboard';
+import SahayakAI from './pages/SahayakAI';
+import RouteMap from './pages/RouteMap';
+import Opportunities from './pages/Opportunities';
+import PitchAnalyzer from './pages/PitchAnalyzer';
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<AppLayout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="chat" element={<Chatbot />} />
-          <Route path="route-map" element={<RouteMap />} />
-          <Route path="pitch" element={<PitchAnalyzer />} />
-          <Route path="opportunities" element={<Opportunities />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <Router>
+      <div className="flex min-h-screen bg-[hsl(var(--background))]">
+        <Sidebar />
+        <main className="flex-1 ml-64 p-8">
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/sahayak-ai" element={<SahayakAI />} />
+            <Route path="/route-map" element={<RouteMap />} />
+            <Route path="/opportunities" element={<Opportunities />} />
+            <Route path="/pitch-analyzer" element={<PitchAnalyzer />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
   );
 }
 
